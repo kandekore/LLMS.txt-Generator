@@ -2,8 +2,9 @@
 /**
  * Plugin Name:       Simple LLMS.txt Generator
  * Description:       A simple plugin to create and manage an llms.txt file from the WordPress admin panel to control AI crawlers.
- * Version:           1.0.0
- * Author:            Darren Kandekore
+ * Version:           1.1.0
+ * Author:            D Kandekore
+ * Author URI:        https://darrenk.uk
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       slg
@@ -38,73 +39,42 @@ function slg_settings_init() {
     // Add a settings section for User-Agents
     add_settings_section(
         'slg_section_user_agents',
-        __( 'Choose AI User-Agents to Control', 'slg' ),
+        __( '1. Choose AI User-Agents', 'slg' ),
         'slg_section_user_agents_callback',
+        'llms_txt_page'
+    );
+    
+    // -- NEW -- Add a settings section for AI Usage Policies
+    add_settings_section(
+        'slg_section_usage_policies',
+        __( '2. Set AI Usage Policies', 'slg' ),
+        'slg_section_usage_policies_callback',
         'llms_txt_page'
     );
 
     // Add a settings section for Disallow Rules
     add_settings_section(
         'slg_section_disallow_rules',
-        __( 'Choose Directories to Disallow', 'slg' ),
+        __( '3. Set Directory Disallow Rules', 'slg' ),
         'slg_section_disallow_rules_callback',
         'llms_txt_page'
     );
 
     // Add fields for User-Agents
-    add_settings_field(
-        'slg_field_gptbot',
-        __( 'GPTBot (OpenAI)', 'slg' ),
-        'slg_field_checkbox_callback',
-        'llms_txt_page',
-        'slg_section_user_agents',
-        [ 'label_for' => 'slg_field_gptbot', 'option_name' => 'gptbot' ]
-    );
-
-    add_settings_field(
-        'slg_field_google_extended',
-        __( 'Google-Extended (Google AI)', 'slg' ),
-        'slg_field_checkbox_callback',
-        'llms_txt_page',
-        'slg_section_user_agents',
-        [ 'label_for' => 'slg_field_google_extended', 'option_name' => 'google_extended' ]
-    );
-
-    add_settings_field(
-        'slg_field_ccbot',
-        __( 'CCBot (Common Crawl)', 'slg' ),
-        'slg_field_checkbox_callback',
-        'llms_txt_page',
-        'slg_section_user_agents',
-        [ 'label_for' => 'slg_field_ccbot', 'option_name' => 'ccbot' ]
-    );
+    add_settings_field('slg_field_gptbot', __( 'GPTBot (OpenAI)', 'slg' ), 'slg_field_checkbox_callback', 'llms_txt_page', 'slg_section_user_agents', [ 'label_for' => 'slg_field_gptbot', 'option_name' => 'gptbot' ]);
+    add_settings_field('slg_field_google_extended', __( 'Google-Extended (Google AI)', 'slg' ), 'slg_field_checkbox_callback', 'llms_txt_page', 'slg_section_user_agents', [ 'label_for' => 'slg_field_google_extended', 'option_name' => 'google_extended' ]);
+    add_settings_field('slg_field_ccbot', __( 'CCBot (Common Crawl)', 'slg' ), 'slg_field_checkbox_callback', 'llms_txt_page', 'slg_section_user_agents', [ 'label_for' => 'slg_field_ccbot', 'option_name' => 'ccbot' ]);
+    
+    // -- NEW -- Add fields for AI Usage Policies
+    add_settings_field('slg_field_training', __( 'Training', 'slg' ), 'slg_field_policy_select_callback', 'llms_txt_page', 'slg_section_usage_policies', [ 'label_for' => 'slg_field_training', 'option_name' => 'training' ]);
+    add_settings_field('slg_field_summarization', __( 'Summarization', 'slg' ), 'slg_field_policy_select_callback', 'llms_txt_page', 'slg_section_usage_policies', [ 'label_for' => 'slg_field_summarization', 'option_name' => 'summarization' ]);
+    add_settings_field('slg_field_indexing', __( 'Indexing', 'slg' ), 'slg_field_policy_select_callback', 'llms_txt_page', 'slg_section_usage_policies', [ 'label_for' => 'slg_field_indexing', 'option_name' => 'indexing' ]);
+    add_settings_field('slg_field_attribution', __( 'Attribution', 'slg' ), 'slg_field_policy_select_callback', 'llms_txt_page', 'slg_section_usage_policies', [ 'label_for' => 'slg_field_attribution', 'option_name' => 'attribution' ]);
 
     // Add fields for Disallow Rules
-    add_settings_field(
-        'slg_field_disallow_wp_admin',
-        __( 'Disallow /wp-admin/', 'slg' ),
-        'slg_field_checkbox_callback',
-        'llms_txt_page',
-        'slg_section_disallow_rules',
-        [ 'label_for' => 'slg_field_disallow_wp_admin', 'option_name' => 'disallow_wp_admin' ]
-    );
-
-    add_settings_field(
-        'slg_field_disallow_wp_includes',
-        __( 'Disallow /wp-includes/', 'slg' ),
-        'slg_field_checkbox_callback',
-        'llms_txt_page',
-        'slg_section_disallow_rules',
-        [ 'label_for' => 'slg_field_disallow_wp_includes', 'option_name' => 'disallow_wp_includes' ]
-    );
-
-    add_settings_field(
-        'slg_field_custom_disallow',
-        __( 'Custom Disallow Rules', 'slg' ),
-        'slg_field_custom_disallow_callback',
-        'llms_txt_page',
-        'slg_section_disallow_rules'
-    );
+    add_settings_field('slg_field_disallow_wp_admin', __( 'Disallow /wp-admin/', 'slg' ), 'slg_field_checkbox_callback', 'llms_txt_page', 'slg_section_disallow_rules', [ 'label_for' => 'slg_field_disallow_wp_admin', 'option_name' => 'disallow_wp_admin' ]);
+    add_settings_field('slg_field_disallow_wp_includes', __( 'Disallow /wp-includes/', 'slg' ), 'slg_field_checkbox_callback', 'llms_txt_page', 'slg_section_disallow_rules', [ 'label_for' => 'slg_field_disallow_wp_includes', 'option_name' => 'disallow_wp_includes' ]);
+    add_settings_field('slg_field_custom_disallow', __( 'Custom Disallow Rules', 'slg' ), 'slg_field_custom_disallow_callback', 'llms_txt_page', 'slg_section_disallow_rules');
 }
 add_action( 'admin_init', 'slg_settings_init' );
 
@@ -113,7 +83,12 @@ add_action( 'admin_init', 'slg_settings_init' );
  * Callbacks for rendering sections and fields.
  */
 function slg_section_user_agents_callback() {
-    echo '<p>' . __( 'Select the AI crawlers you wish to add rules for. The rules below will apply to all selected agents.', 'slg' ) . '</p>';
+    echo '<p>' . __( 'Select the AI crawlers you wish to add rules for. The policies and rules below will apply to all selected agents.', 'slg' ) . '</p>';
+}
+
+// -- NEW --
+function slg_section_usage_policies_callback() {
+    echo '<p>' . __( 'Specify how the selected AI agents are permitted to use your site content.', 'slg' ) . '</p>';
 }
 
 function slg_section_disallow_rules_callback() {
@@ -125,6 +100,21 @@ function slg_field_checkbox_callback( $args ) {
     $option_name = $args['option_name'];
     $checked = isset( $options[$option_name] ) ? 'checked' : '';
     echo "<input type='checkbox' id='{$args['label_for']}' name='slg_options[{$option_name}]' {$checked}>";
+}
+
+// -- NEW -- Callback for the policy dropdowns
+function slg_field_policy_select_callback( $args ) {
+    $options = get_option('slg_options');
+    $option_name = $args['option_name'];
+    // Default to 'Allow' if not set
+    $current_value = isset($options[$option_name]) ? $options[$option_name] : 'allow';
+    
+    echo "<select id='{$args['label_for']}' name='slg_options[{$option_name}]'>";
+    echo '<option value="allow"' . selected($current_value, 'allow', false) . '>' . __('Allow', 'slg') . '</option>';
+    echo '<option value="disallow"' . selected($current_value, 'disallow', false) . '>' . __('Disallow', 'slg') . '</option>';
+    echo '</select>';
+    echo '<p class="description">' . sprintf( __( 'Controls if AI can use content for <strong>%s</strong>.', 'slg' ), esc_html( ucfirst($option_name) ) ) . '</p>';
+
 }
 
 function slg_field_custom_disallow_callback() {
@@ -164,27 +154,23 @@ function slg_generate_llms_txt_file( $old_value, $value ) {
     $agents = [];
 
     // Map option keys to User-Agent strings
-    if ( ! empty( $value['gptbot'] ) ) {
-        $agents[] = 'GPTBot';
-    }
-    if ( ! empty( $value['google_extended'] ) ) {
-        $agents[] = 'Google-Extended';
-    }
-    if ( ! empty( $value['ccbot'] ) ) {
-        $agents[] = 'CCBot';
+    if ( ! empty( $value['gptbot'] ) ) $agents[] = 'GPTBot';
+    if ( ! empty( $value['google_extended'] ) ) $agents[] = 'Google-Extended';
+    if ( ! empty( $value['ccbot'] ) ) $agents[] = 'CCBot';
+
+    // -- NEW -- Build policy rules
+    $policy_rules = [];
+    $policies = ['training', 'summarization', 'indexing', 'attribution'];
+    foreach ($policies as $policy) {
+        if (isset($value[$policy])) {
+            $policy_rules[] = ucfirst($policy) . ': ' . ucfirst($value[$policy]);
+        }
     }
 
-    // If no agents are selected, we can stop or create an empty file.
-    // Let's build the content even if agents are selected later.
-    
+    // Build Disallow rules
     $disallow_rules = [];
-    if ( ! empty( $value['disallow_wp_admin'] ) ) {
-        $disallow_rules[] = 'Disallow: /wp-admin/';
-    }
-    if ( ! empty( $value['disallow_wp_includes'] ) ) {
-        $disallow_rules[] = 'Disallow: /wp-includes/';
-    }
-
+    if ( ! empty( $value['disallow_wp_admin'] ) ) $disallow_rules[] = 'Disallow: /wp-admin/';
+    if ( ! empty( $value['disallow_wp_includes'] ) ) $disallow_rules[] = 'Disallow: /wp-includes/';
     if ( ! empty( $value['custom_disallow'] ) ) {
         $custom_lines = explode( "\n", str_replace( "\r", "", $value['custom_disallow'] ) );
         foreach ( $custom_lines as $line ) {
@@ -196,11 +182,16 @@ function slg_generate_llms_txt_file( $old_value, $value ) {
     }
 
     // Build the file content string
-    if ( ! empty( $agents ) && ! empty( $disallow_rules ) ) {
+    if ( ! empty( $agents ) ) {
         foreach ( $agents as $agent ) {
             $file_content .= "User-agent: " . $agent . PHP_EOL;
         }
-        $file_content .= implode( PHP_EOL, $disallow_rules ) . PHP_EOL;
+
+        // Add policies and disallow rules if they exist
+        $rules_to_add = array_merge($policy_rules, $disallow_rules);
+        if (!empty($rules_to_add)) {
+            $file_content .= implode( PHP_EOL, $rules_to_add ) . PHP_EOL;
+        }
     }
 
     // Get the path to the WordPress root directory
@@ -216,7 +207,6 @@ function slg_generate_llms_txt_file( $old_value, $value ) {
         set_transient( 'slg_admin_notice', 'error', 5 );
     }
 }
-// This hook fires after the option has been successfully updated in the database.
 add_action( 'update_option_slg_options', 'slg_generate_llms_txt_file', 10, 2 );
 
 
