@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name:       Simple LLMS.txt Generator
- * Description:       A simple plugin to create and manage an llms.txt file from the WordPress admin panel to control AI crawlers.
- * Version:           1.1.0
+ * Description:       Create and manage an llms.txt file from the WordPress admin to control AI crawlers. Includes one-click generate and download.
+ * Version:           1.2.0
  * Author:            D Kandekore
  * Author URI:        https://darrenk.uk
  * License:           GPL-2.0-or-later
@@ -10,41 +10,45 @@
  * Text Domain:       slg
  */
 
-// If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
     die;
 }
 
 /**
- * Add the options page to the admin menu.
+ * Ensure core helpers are available.
+ */
+if ( ! function_exists( 'get_home_path' ) ) {
+    require_once ABSPATH . 'wp-admin/includes/file.php';
+}
+require_once ABSPATH . 'wp-admin/includes/file.php';
+
+/**
+ * Admin menu.
  */
 function slg_add_admin_menu() {
     add_options_page(
-        'LLMS.txt Generator',          // Page title
-        'LLMS.txt Generator',          // Menu title
-        'manage_options',              // Capability required
-        'llms_txt_generator',          // Menu slug
-        'slg_options_page_html'        // Function to display the page
+        'LLMS.txt Generator',
+        'LLMS.txt Generator',
+        'manage_options',
+        'llms_txt_generator',
+        'slg_options_page_html'
     );
 }
 add_action( 'admin_menu', 'slg_add_admin_menu' );
 
 /**
- * Register settings, sections, and fields.
+ * Settings registration.
  */
 function slg_settings_init() {
-    // Register a setting
     register_setting( 'llms_txt_page', 'slg_options' );
 
-    // Add a settings section for User-Agents
     add_settings_section(
         'slg_section_user_agents',
         __( '1. Choose AI User-Agents', 'slg' ),
         'slg_section_user_agents_callback',
         'llms_txt_page'
     );
-    
-    // -- NEW -- Add a settings section for AI Usage Policies
+
     add_settings_section(
         'slg_section_usage_policies',
         __( '2. Set AI Usage Policies', 'slg' ),
@@ -52,7 +56,6 @@ function slg_settings_init() {
         'llms_txt_page'
     );
 
-    // Add a settings section for Disallow Rules
     add_settings_section(
         'slg_section_disallow_rules',
         __( '3. Set Directory Disallow Rules', 'slg' ),
@@ -60,169 +63,303 @@ function slg_settings_init() {
         'llms_txt_page'
     );
 
-    // Add fields for User-Agents
+    // User agents.
     add_settings_field('slg_field_gptbot', __( 'GPTBot (OpenAI)', 'slg' ), 'slg_field_checkbox_callback', 'llms_txt_page', 'slg_section_user_agents', [ 'label_for' => 'slg_field_gptbot', 'option_name' => 'gptbot' ]);
     add_settings_field('slg_field_google_extended', __( 'Google-Extended (Google AI)', 'slg' ), 'slg_field_checkbox_callback', 'llms_txt_page', 'slg_section_user_agents', [ 'label_for' => 'slg_field_google_extended', 'option_name' => 'google_extended' ]);
     add_settings_field('slg_field_ccbot', __( 'CCBot (Common Crawl)', 'slg' ), 'slg_field_checkbox_callback', 'llms_txt_page', 'slg_section_user_agents', [ 'label_for' => 'slg_field_ccbot', 'option_name' => 'ccbot' ]);
-    
-    // -- NEW -- Add fields for AI Usage Policies
+
+    // Policies.
     add_settings_field('slg_field_training', __( 'Training', 'slg' ), 'slg_field_policy_select_callback', 'llms_txt_page', 'slg_section_usage_policies', [ 'label_for' => 'slg_field_training', 'option_name' => 'training' ]);
     add_settings_field('slg_field_summarization', __( 'Summarization', 'slg' ), 'slg_field_policy_select_callback', 'llms_txt_page', 'slg_section_usage_policies', [ 'label_for' => 'slg_field_summarization', 'option_name' => 'summarization' ]);
     add_settings_field('slg_field_indexing', __( 'Indexing', 'slg' ), 'slg_field_policy_select_callback', 'llms_txt_page', 'slg_section_usage_policies', [ 'label_for' => 'slg_field_indexing', 'option_name' => 'indexing' ]);
     add_settings_field('slg_field_attribution', __( 'Attribution', 'slg' ), 'slg_field_policy_select_callback', 'llms_txt_page', 'slg_section_usage_policies', [ 'label_for' => 'slg_field_attribution', 'option_name' => 'attribution' ]);
 
-    // Add fields for Disallow Rules
+    // Disallow rules.
     add_settings_field('slg_field_disallow_wp_admin', __( 'Disallow /wp-admin/', 'slg' ), 'slg_field_checkbox_callback', 'llms_txt_page', 'slg_section_disallow_rules', [ 'label_for' => 'slg_field_disallow_wp_admin', 'option_name' => 'disallow_wp_admin' ]);
     add_settings_field('slg_field_disallow_wp_includes', __( 'Disallow /wp-includes/', 'slg' ), 'slg_field_checkbox_callback', 'llms_txt_page', 'slg_section_disallow_rules', [ 'label_for' => 'slg_field_disallow_wp_includes', 'option_name' => 'disallow_wp_includes' ]);
     add_settings_field('slg_field_custom_disallow', __( 'Custom Disallow Rules', 'slg' ), 'slg_field_custom_disallow_callback', 'llms_txt_page', 'slg_section_disallow_rules');
 }
 add_action( 'admin_init', 'slg_settings_init' );
 
-
 /**
- * Callbacks for rendering sections and fields.
+ * Section callbacks.
  */
 function slg_section_user_agents_callback() {
     echo '<p>' . __( 'Select the AI crawlers you wish to add rules for. The policies and rules below will apply to all selected agents.', 'slg' ) . '</p>';
 }
-
-// -- NEW --
 function slg_section_usage_policies_callback() {
     echo '<p>' . __( 'Specify how the selected AI agents are permitted to use your site content.', 'slg' ) . '</p>';
 }
-
 function slg_section_disallow_rules_callback() {
     echo '<p>' . __( 'Select standard paths to block, and add any other custom paths you want to disallow.', 'slg' ) . '</p>';
 }
 
+/**
+ * Field callbacks.
+ */
 function slg_field_checkbox_callback( $args ) {
-    $options = get_option( 'slg_options' );
+    $options = get_option( 'slg_options', [] );
     $option_name = $args['option_name'];
     $checked = isset( $options[$option_name] ) ? 'checked' : '';
     echo "<input type='checkbox' id='{$args['label_for']}' name='slg_options[{$option_name}]' {$checked}>";
 }
-
-// -- NEW -- Callback for the policy dropdowns
 function slg_field_policy_select_callback( $args ) {
-    $options = get_option('slg_options');
+    $options = get_option('slg_options', []);
     $option_name = $args['option_name'];
-    // Default to 'Allow' if not set
     $current_value = isset($options[$option_name]) ? $options[$option_name] : 'allow';
-    
     echo "<select id='{$args['label_for']}' name='slg_options[{$option_name}]'>";
     echo '<option value="allow"' . selected($current_value, 'allow', false) . '>' . __('Allow', 'slg') . '</option>';
     echo '<option value="disallow"' . selected($current_value, 'disallow', false) . '>' . __('Disallow', 'slg') . '</option>';
     echo '</select>';
     echo '<p class="description">' . sprintf( __( 'Controls if AI can use content for <strong>%s</strong>.', 'slg' ), esc_html( ucfirst($option_name) ) ) . '</p>';
-
 }
-
 function slg_field_custom_disallow_callback() {
-    $options = get_option( 'slg_options' );
+    $options = get_option( 'slg_options', [] );
     $custom_rules = isset( $options['custom_disallow'] ) ? esc_textarea( $options['custom_disallow'] ) : '';
-    echo "<textarea name='slg_options[custom_disallow]' rows='5' cols='50' class='large-text' placeholder='/private-directory/{PHP_EOL}/some-specific-page.html'>{$custom_rules}</textarea>";
+    echo "<textarea name='slg_options[custom_disallow]' rows='5' cols='50' class='large-text' placeholder='/private-directory/\n/some-specific-page.html'>{$custom_rules}</textarea>";
     echo '<p class="description">' . __( 'Enter one path per line, starting with a slash. e.g., <code>/wp-content/plugins/</code>', 'slg' ) . '</p>';
 }
 
 /**
- * Display the main options page HTML.
+ * Build the file content string from option values.
  */
-function slg_options_page_html() {
-    if ( ! current_user_can( 'manage_options' ) ) {
-        return;
-    }
-    ?>
-    <div class="wrap">
-        <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-        <p>This page allows you to create an <code>llms.txt</code> file in your website's root directory. This file works like <code>robots.txt</code> but is specifically for Large Language Models (LLMs) or AI crawlers.</p>
-        <form action="options.php" method="post">
-            <?php
-            settings_fields( 'llms_txt_page' );
-            do_settings_sections( 'llms_txt_page' );
-            submit_button( 'Save Settings & Generate File' );
-            ?>
-        </form>
-    </div>
-    <?php
-}
-
-/**
- * Generate the llms.txt file when settings are updated.
- */
-function slg_generate_llms_txt_file( $old_value, $value ) {
+function slg_build_llms_content( $value ) {
     $file_content = '';
     $agents = [];
 
-    // Map option keys to User-Agent strings
-    if ( ! empty( $value['gptbot'] ) ) $agents[] = 'GPTBot';
+    if ( ! empty( $value['gptbot'] ) )          $agents[] = 'GPTBot';
     if ( ! empty( $value['google_extended'] ) ) $agents[] = 'Google-Extended';
-    if ( ! empty( $value['ccbot'] ) ) $agents[] = 'CCBot';
+    if ( ! empty( $value['ccbot'] ) )           $agents[] = 'CCBot';
 
-    // -- NEW -- Build policy rules
     $policy_rules = [];
-    $policies = ['training', 'summarization', 'indexing', 'attribution'];
-    foreach ($policies as $policy) {
-        if (isset($value[$policy])) {
-            $policy_rules[] = ucfirst($policy) . ': ' . ucfirst($value[$policy]);
+    foreach ( ['training','summarization','indexing','attribution'] as $policy ) {
+        if ( isset( $value[ $policy ] ) ) {
+            $policy_rules[] = ucfirst( $policy ) . ': ' . ucfirst( $value[ $policy ] );
         }
     }
 
-    // Build Disallow rules
     $disallow_rules = [];
-    if ( ! empty( $value['disallow_wp_admin'] ) ) $disallow_rules[] = 'Disallow: /wp-admin/';
+    if ( ! empty( $value['disallow_wp_admin'] ) )    $disallow_rules[] = 'Disallow: /wp-admin/';
     if ( ! empty( $value['disallow_wp_includes'] ) ) $disallow_rules[] = 'Disallow: /wp-includes/';
     if ( ! empty( $value['custom_disallow'] ) ) {
         $custom_lines = explode( "\n", str_replace( "\r", "", $value['custom_disallow'] ) );
         foreach ( $custom_lines as $line ) {
             $line = trim( $line );
-            if ( ! empty( $line ) ) {
-                $disallow_rules[] = 'Disallow: ' . esc_html( $line );
+            if ( $line !== '' ) {
+                // sanitize without HTML-encoding
+                $disallow_rules[] = 'Disallow: ' . ltrim( sanitize_text_field( $line ) );
             }
         }
     }
 
-    // Build the file content string
     if ( ! empty( $agents ) ) {
-        foreach ( $agents as $agent ) {
-            $file_content .= "User-agent: " . $agent . PHP_EOL;
-        }
+        // Single block for all agents
+        $file_content .= 'User-agent: ' . implode( ', ', $agents ) . PHP_EOL;
 
-        // Add policies and disallow rules if they exist
-        $rules_to_add = array_merge($policy_rules, $disallow_rules);
-        if (!empty($rules_to_add)) {
+        $rules_to_add = array_merge( $policy_rules, $disallow_rules );
+        if ( ! empty( $rules_to_add ) ) {
             $file_content .= implode( PHP_EOL, $rules_to_add ) . PHP_EOL;
         }
     }
 
-    // Get the path to the WordPress root directory
-    $file_path = get_home_path() . 'llms.txt';
-
-    // Write the content to the file
-    $file_written = file_put_contents( $file_path, $file_content );
-
-    // Set a transient to show an admin notice on success or failure
-    if ( $file_written !== false ) {
-        set_transient( 'slg_admin_notice', 'success', 5 );
-    } else {
-        set_transient( 'slg_admin_notice', 'error', 5 );
+    // Ensure file ends with newline
+    if ( substr( $file_content, -1 ) !== "\n" ) {
+        $file_content .= PHP_EOL;
     }
+
+    return $file_content;
+}
+
+/**
+ * Write helper (WP_Filesystem with fallback).
+ */
+function slg_write_file( $path, $contents ) {
+    global $wp_filesystem;
+    if ( ! $wp_filesystem ) {
+        WP_Filesystem();
+    }
+    if ( $wp_filesystem ) {
+        return $wp_filesystem->put_contents( $path, $contents, FS_CHMOD_FILE );
+    }
+    return @file_put_contents( $path, $contents );
+}
+
+/**
+ * Option-updated hook (auto-generate when settings change).
+ */
+function slg_generate_llms_txt_file( $old_value, $value ) {
+    $content   = slg_build_llms_content( $value );
+    $file_path = trailingslashit( get_home_path() ) . 'llms.txt';
+    $written   = slg_write_file( $file_path, $content );
+
+    set_transient( 'slg_admin_notice', $written ? 'success' : 'error', 30 );
 }
 add_action( 'update_option_slg_options', 'slg_generate_llms_txt_file', 10, 2 );
 
+/**
+ * First-time save (option added) — also generate.
+ */
+add_action( 'added_option', function( $option, $value ) {
+    if ( 'slg_options' === $option ) {
+        slg_generate_llms_txt_file( null, $value );
+    }
+}, 10, 2 );
 
 /**
- * Display admin notices based on the transient.
+ * Admin notices.
  */
 function slg_display_admin_notices() {
-    if ( get_transient( 'slg_admin_notice' ) ) {
-        $notice_type = get_transient( 'slg_admin_notice' );
-        if ( $notice_type === 'success' ) {
-            $file_url = home_url( '/llms.txt' );
-            echo '<div class="notice notice-success is-dismissible"><p>' . sprintf( __( 'Success! The <code>llms.txt</code> file has been generated. You can <a href="%s" target="_blank">view it here</a>.', 'slg' ), esc_url($file_url) ) . '</p></div>';
-        } else {
-            echo '<div class="notice notice-error is-dismissible"><p>' . __( '<strong>Error:</strong> The <code>llms.txt</code> file could not be created. Please check if your web server has permission to write to the WordPress root directory.', 'slg' ) . '</p></div>';
-        }
-        delete_transient( 'slg_admin_notice' );
+    if ( ! current_user_can( 'manage_options' ) ) {
+        return;
     }
+    $notice = get_transient( 'slg_admin_notice' );
+    if ( ! $notice ) {
+        return;
+    }
+
+    $file_url  = esc_url( home_url( '/llms.txt' ) );
+    $file_path = trailingslashit( get_home_path() ) . 'llms.txt';
+
+    if ( in_array( $notice, [ 'success', 'generated_now_success' ], true ) ) {
+        // Try to get filesize if it exists
+        $size_text = '';
+        if ( file_exists( $file_path ) ) {
+            $bytes = filesize( $file_path );
+            if ( $bytes !== false ) {
+                $size_text = ' (' . size_format( $bytes ) . ')';
+            }
+        }
+
+        echo '<div class="notice notice-success is-dismissible"><p>';
+        echo __( 'Success! The <code>llms.txt</code> file has been generated and uploaded to your site root.', 'slg' ) . $size_text . ' ';
+        printf(
+            __( 'You can <a href="%s" target="_blank">view it here</a>.', 'slg' ),
+            $file_url
+        );
+        echo '</p></div>';
+    } elseif ( 'download_ready' === $notice ) {
+        echo '<div class="notice notice-info is-dismissible"><p>' . __( 'A fresh copy of <code>llms.txt</code> has been prepared for download.', 'slg' ) . '</p></div>';
+    } else {
+        echo '<div class="notice notice-error is-dismissible"><p>' . __( '<strong>Error:</strong> The <code>llms.txt</code> file could not be created. Please check write permissions to the WordPress root directory.', 'slg' ) . '</p></div>';
+    }
+
+    delete_transient( 'slg_admin_notice' );
 }
 add_action( 'admin_notices', 'slg_display_admin_notices' );
+
+/**
+ * Settings page UI.
+ */
+function slg_options_page_html() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+
+    $generate_action = 'slg_generate_now';
+    $download_action = 'slg_download_llms';
+    $page_slug       = 'llms_txt_generator';
+    $file_exists     = file_exists( trailingslashit( get_home_path() ) . 'llms.txt' );
+    ?>
+    <div class="wrap">
+        <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+        <p><?php esc_html_e( 'This page lets you create an', 'slg' ); ?> <code>llms.txt</code> <?php esc_html_e( 'file (like robots.txt) to guide LLM/AI crawlers.', 'slg' ); ?></p>
+
+        <form action="options.php" method="post" style="margin-top:1em;">
+            <?php
+            settings_fields( 'llms_txt_page' );
+            do_settings_sections( 'llms_txt_page' );
+            submit_button( __( 'Save Settings & Generate File', 'slg' ) );
+            ?>
+        </form>
+
+        <hr style="margin: 24px 0;">
+
+        <h2><?php esc_html_e( 'Actions', 'slg' ); ?></h2>
+        <p><?php esc_html_e( 'Use these tools to generate or download the current llms.txt anytime:', 'slg' ); ?></p>
+
+        <!-- Generate Now -->
+        <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block; margin-right:10px;">
+            <?php wp_nonce_field( $generate_action . '_nonce', '_slg_nonce' ); ?>
+            <input type="hidden" name="action" value="<?php echo esc_attr( $generate_action ); ?>">
+            <?php submit_button( __( 'Generate Now', 'slg' ), 'primary', 'submit', false ); ?>
+        </form>
+
+        <!-- Download -->
+        <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;">
+            <?php wp_nonce_field( $download_action . '_nonce', '_slg_nonce' ); ?>
+            <input type="hidden" name="action" value="<?php echo esc_attr( $download_action ); ?>">
+            <?php submit_button( $file_exists ? __( 'Download Current llms.txt', 'slg' ) : __( 'Download Preview llms.txt', 'slg' ), 'secondary', 'submit', false ); ?>
+        </form>
+
+        <?php if ( $file_exists ) : ?>
+            <p style="margin-top:10px;">
+                <?php
+                printf(
+                    __( 'Current file: <a href="%s" target="_blank">/llms.txt</a>', 'slg' ),
+                    esc_url( home_url( '/llms.txt' ) )
+                );
+                ?>
+            </p>
+        <?php endif; ?>
+    </div>
+    <?php
+}
+
+/**
+ * Handle "Generate Now" (runs even if options didn’t change).
+ */
+function slg_handle_generate_now() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_die( __( 'Unauthorized.', 'slg' ) );
+    }
+
+    $action = 'slg_generate_now';
+    check_admin_referer( $action . '_nonce', '_slg_nonce' );
+
+    $options   = get_option( 'slg_options', [] );
+    $content   = slg_build_llms_content( $options );
+    $file_path = trailingslashit( get_home_path() ) . 'llms.txt';
+    $written   = slg_write_file( $file_path, $content );
+
+    set_transient( 'slg_admin_notice', $written ? 'generated_now_success' : 'error', 30 );
+
+    $redirect = add_query_arg( [ 'page' => 'llms_txt_generator' ], admin_url( 'options-general.php' ) );
+    wp_safe_redirect( $redirect );
+    exit;
+}
+add_action( 'admin_post_slg_generate_now', 'slg_handle_generate_now' );
+
+/**
+ * Handle "Download llms.txt".
+ * If the file exists, download actual; else, serve generated preview from current settings.
+ */
+function slg_handle_download_llms() {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        wp_die( __( 'Unauthorized.', 'slg' ) );
+    }
+
+    $action = 'slg_download_llms';
+    check_admin_referer( $action . '_nonce', '_slg_nonce' );
+
+    $file_path = trailingslashit( get_home_path() ) . 'llms.txt';
+    $filename  = 'llms.txt';
+    $contents  = '';
+
+    if ( file_exists( $file_path ) && is_readable( $file_path ) ) {
+        $contents = file_get_contents( $file_path );
+    } else {
+        // Fallback: generate preview based on current options
+        $options  = get_option( 'slg_options', [] );
+        $contents = slg_build_llms_content( $options );
+    }
+
+    // Serve download
+    nocache_headers();
+    header( 'Content-Description: File Transfer' );
+    header( 'Content-Type: text/plain; charset=utf-8' );
+    header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+    header( 'Content-Length: ' . strlen( $contents ) );
+    echo $contents;
+    exit;
+}
+add_action( 'admin_post_slg_download_llms', 'slg_handle_download_llms' );
