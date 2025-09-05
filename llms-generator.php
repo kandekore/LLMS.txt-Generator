@@ -7,7 +7,7 @@
  * Author URI:        https://darrenk.uk
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       simplellms-txt-generator
+ * Text Domain:       simple-llms-txt-generator
  */
 
 if ( ! defined( 'WPINC' ) ) {
@@ -148,7 +148,7 @@ function llms_txt_generator_field_policy_select_callback( $args ) {
     );
     echo '<option value="allow"' . selected($current_value, 'allow', false) . '>' . esc_html__('Allow', 'simple-llms-txt-generator') . '</option>';
     echo '<option value="disallow"' . selected($current_value, 'disallow', false) . '>' . esc_html__('Disallow', 'simple-llms-txt-generator') . '</option>';
-    echo '</select>';
+    // translators: %s: The policy name (Training, Summarization, etc.).
     echo '<p class="description">' . sprintf( esc_html__( 'Controls if AI can use content for %s.', 'simple-llms-txt-generator' ), '<strong>' . esc_html( ucfirst($option_name) ) . '</strong>' ) . '</p>';
 }
 function llms_txt_generator_field_custom_disallow_callback() {
@@ -274,6 +274,7 @@ function llms_txt_generator_display_admin_notices() {
 
         echo '<div class="notice notice-success is-dismissible"><p>';
         echo esc_html__( 'Success! The llms.txt file has been generated and uploaded to your site root.', 'simple-llms-txt-generator' ) . esc_html( $size_text ) . ' ';
+        // translators: %s: a link to the llms.txt file.
         printf(
             esc_html__( 'You can %s.', 'simple-llms-txt-generator' ),
             sprintf( '<a href="%s" target="_blank">%s</a>', esc_url( $file_url ), esc_html__( 'view it here', 'simple-llms-txt-generator' ) )
@@ -333,6 +334,7 @@ function llms_txt_generator_options_page_html() {
         <?php if ( $file_exists ) : ?>
             <p style="margin-top:10px;">
                 <?php
+                // translators: %s: a link to the llms.txt file.
                 printf(
                     esc_html__( 'Current file: %s', 'simple-llms-txt-generator' ),
                     sprintf( '<a href="%s" target="_blank">%s</a>', esc_url( home_url( '/llms.txt' ) ), esc_html__( '/llms.txt', 'simple-llms-txt-generator' ) )
