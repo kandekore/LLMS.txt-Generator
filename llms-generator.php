@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin Name:       LLMS.txt Generator
+ * Plugin Name:       Simple LLMS.txt Generator
  * Description:       Create and manage an llms.txt file from the WordPress admin to control AI crawlers. Includes one-click generate and download.
  * Version:           1.2.0
  * Author:            D Kandekore
  * Author URI:        https://darrenk.uk
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       llms-txt-generator
+ * Text Domain:       simple-llms-txt-generator 
  */
 
 if ( ! defined( 'WPINC' ) ) {
