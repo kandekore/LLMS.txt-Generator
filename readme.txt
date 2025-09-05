@@ -1,6 +1,6 @@
 === Simple LLMS.txt Generator ===
 Contributors: Darren Kandekore
-Tags: llms.txt, llms, ai, robots, robots.txt, wordpress, generator, block, crawler, crawlers, gptbot, google-extended, ccbot
+Tags: llms.txt, llms, ai, SEO, robots.txt
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
@@ -8,7 +8,7 @@ Stable tag: 1.2.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Create and manage an llms.txt file from your WordPress admin to guide LLM/AI crawlers (similar to robots.txt). This plugin lets you choose AI user-agents, set policies, and add disallow rules.
+Create and manage an llms.txt file from your WordPress admin to guide LLM/AI crawlers. Set policies and disallow rules.
 
 == Description ==
 
