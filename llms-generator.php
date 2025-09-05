@@ -153,11 +153,11 @@ function llms_txt_generator_field_policy_select_callback( $args ) {
 }
 function llms_txt_generator_field_custom_disallow_callback() {
     $options = get_option( 'slg_options', [] );
-    $custom_rules = isset( $options['custom_disallow'] ) ? esc_textarea( $options['custom_disallow'] ) : '';
+    $custom_rules = isset( $options['custom_disallow'] ) ? $options['custom_disallow'] : '';
     printf(
         '<textarea name="slg_options[custom_disallow]" rows="5" cols="50" class="large-text" placeholder="%s">%s</textarea>',
         esc_attr( '/private-directory/' . "\n" . '/some-specific-page.html' ),
-        $custom_rules
+        esc_textarea( $custom_rules )
     );
     echo '<p class="description">' . esc_html__( 'Enter one path per line, starting with a slash. e.g., /wp-content/plugins/', 'simple-llms-txt-generator' ) . '</p>';
 }
