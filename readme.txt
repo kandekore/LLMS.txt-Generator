@@ -1,4 +1,4 @@
-=== Simple LLMS.txt Generator ===
+=== LLMS.txt Generator ===
 Contributors: Darren Kandekore
 Tags: llms.txt, llms, ai, SEO, robots.txt
 Requires at least: 6.0
