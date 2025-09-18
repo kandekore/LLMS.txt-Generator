@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin Name:       Simple LLMS.txt Generator
+ * Plugin Name:       Kandeshop LLMS.txt Generator
  * Description:       Create and manage an llms.txt file from the WordPress admin to control AI crawlers. Includes one-click generate and download.
  * Version:           1.2.0
  * Author:            D Kandekore
  * Author URI:        https://darrenk.uk
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       simple-llms-txt-generator
+ * Text Domain:       kandeshop-llms-txt-generator
  */
 
 if ( ! defined( 'WPINC' ) ) {
@@ -27,8 +27,8 @@ require_once ABSPATH . 'wp-admin/includes/file.php';
  */
 function llms_txt_generator_add_admin_menu() {
     add_options_page(
-        esc_html__( 'LLMS.txt Generator', 'simple-llms-txt-generator' ),
-        esc_html__( 'LLMS.txt Generator', 'simple-llms-txt-generator' ),
+        esc_html__( 'LLMS.txt Generator', 'kandeshop-llms-txt-generator' ),
+        esc_html__( 'LLMS.txt Generator', 'kandeshop-llms-txt-generator' ),
         'manage_options',
         'llms_txt_generator',
         'llms_txt_generator_options_page_html'
@@ -44,40 +44,40 @@ function llms_txt_generator_settings_init() {
 
     add_settings_section(
         'slg_section_user_agents',
-        esc_html__( '1. Choose AI User-Agents', 'simple-llms-txt-generator' ),
+        esc_html__( '1. Choose AI User-Agents', 'kandeshop-llms-txt-generator' ),
         'llms_txt_generator_section_user_agents_callback',
         'llms_txt_page'
     );
 
     add_settings_section(
         'slg_section_usage_policies',
-        esc_html__( '2. Set AI Usage Policies', 'simple-llms-txt-generator' ),
+        esc_html__( '2. Set AI Usage Policies', 'kandeshop-llms-txt-generator' ),
         'llms_txt_generator_section_usage_policies_callback',
         'llms_txt_page'
     );
 
     add_settings_section(
         'slg_section_disallow_rules',
-        esc_html__( '3. Set Directory Disallow Rules', 'simple-llms-txt-generator' ),
+        esc_html__( '3. Set Directory Disallow Rules', 'kandeshop-llms-txt-generator' ),
         'llms_txt_generator_section_disallow_rules_callback',
         'llms_txt_page'
     );
 
     // User agents.
-    add_settings_field('slg_field_gptbot', esc_html__( 'GPTBot (OpenAI)', 'simple-llms-txt-generator' ), 'llms_txt_generator_field_checkbox_callback', 'llms_txt_page', 'slg_section_user_agents', [ 'label_for' => 'slg_field_gptbot', 'option_name' => 'gptbot' ]);
-    add_settings_field('slg_field_google_extended', esc_html__( 'Google-Extended (Google AI)', 'simple-llms-txt-generator' ), 'llms_txt_generator_field_checkbox_callback', 'llms_txt_page', 'slg_section_user_agents', [ 'label_for' => 'slg_field_google_extended', 'option_name' => 'google_extended' ]);
-    add_settings_field('slg_field_ccbot', esc_html__( 'CCBot (Common Crawl)', 'simple-llms-txt-generator' ), 'llms_txt_generator_field_checkbox_callback', 'llms_txt_page', 'slg_section_user_agents', [ 'label_for' => 'slg_field_ccbot', 'option_name' => 'ccbot' ]);
+    add_settings_field('slg_field_gptbot', esc_html__( 'GPTBot (OpenAI)', 'kandeshop-llms-txt-generator' ), 'llms_txt_generator_field_checkbox_callback', 'llms_txt_page', 'slg_section_user_agents', [ 'label_for' => 'slg_field_gptbot', 'option_name' => 'gptbot' ]);
+    add_settings_field('slg_field_google_extended', esc_html__( 'Google-Extended (Google AI)', 'kandeshop-llms-txt-generator' ), 'llms_txt_generator_field_checkbox_callback', 'llms_txt_page', 'slg_section_user_agents', [ 'label_for' => 'slg_field_google_extended', 'option_name' => 'google_extended' ]);
+    add_settings_field('slg_field_ccbot', esc_html__( 'CCBot (Common Crawl)', 'kandeshop-llms-txt-generator' ), 'llms_txt_generator_field_checkbox_callback', 'llms_txt_page', 'slg_section_user_agents', [ 'label_for' => 'slg_field_ccbot', 'option_name' => 'ccbot' ]);
 
     // Policies.
-    add_settings_field('slg_field_training', esc_html__( 'Training', 'simple-llms-txt-generator' ), 'llms_txt_generator_field_policy_select_callback', 'llms_txt_page', 'slg_section_usage_policies', [ 'label_for' => 'slg_field_training', 'option_name' => 'training' ]);
-    add_settings_field('slg_field_summarization', esc_html__( 'Summarization', 'simple-llms-txt-generator' ), 'llms_txt_generator_field_policy_select_callback', 'llms_txt_page', 'slg_section_usage_policies', [ 'label_for' => 'slg_field_summarization', 'option_name' => 'summarization' ]);
-    add_settings_field('slg_field_indexing', esc_html__( 'Indexing', 'simple-llms-txt-generator' ), 'llms_txt_generator_field_policy_select_callback', 'llms_txt_page', 'slg_section_usage_policies', [ 'label_for' => 'slg_field_indexing', 'option_name' => 'indexing' ]);
-    add_settings_field('slg_field_attribution', esc_html__( 'Attribution', 'simple-llms-txt-generator' ), 'llms_txt_generator_field_policy_select_callback', 'llms_txt_page', 'slg_section_usage_policies', [ 'label_for' => 'slg_field_attribution', 'option_name' => 'attribution' ]);
+    add_settings_field('slg_field_training', esc_html__( 'Training', 'kandeshop-llms-txt-generator' ), 'llms_txt_generator_field_policy_select_callback', 'llms_txt_page', 'slg_section_usage_policies', [ 'label_for' => 'slg_field_training', 'option_name' => 'training' ]);
+    add_settings_field('slg_field_summarization', esc_html__( 'Summarization', 'kandeshop-llms-txt-generator' ), 'llms_txt_generator_field_policy_select_callback', 'llms_txt_page', 'slg_section_usage_policies', [ 'label_for' => 'slg_field_summarization', 'option_name' => 'summarization' ]);
+    add_settings_field('slg_field_indexing', esc_html__( 'Indexing', 'kandeshop-llms-txt-generator' ), 'llms_txt_generator_field_policy_select_callback', 'llms_txt_page', 'slg_section_usage_policies', [ 'label_for' => 'slg_field_indexing', 'option_name' => 'indexing' ]);
+    add_settings_field('slg_field_attribution', esc_html__( 'Attribution', 'kandeshop-llms-txt-generator' ), 'llms_txt_generator_field_policy_select_callback', 'llms_txt_page', 'slg_section_usage_policies', [ 'label_for' => 'slg_field_attribution', 'option_name' => 'attribution' ]);
 
     // Disallow rules.
-    add_settings_field('slg_field_disallow_wp_admin', esc_html__( 'Disallow /wp-admin/', 'simple-llms-txt-generator' ), 'llms_txt_generator_field_checkbox_callback', 'llms_txt_page', 'slg_section_disallow_rules', [ 'label_for' => 'slg_field_disallow_wp_admin', 'option_name' => 'disallow_wp_admin' ]);
-    add_settings_field('slg_field_disallow_wp_includes', esc_html__( 'Disallow /wp-includes/', 'simple-llms-txt-generator' ), 'llms_txt_generator_field_checkbox_callback', 'llms_txt_page', 'slg_section_disallow_rules', [ 'label_for' => 'slg_field_disallow_wp_includes', 'option_name' => 'disallow_wp_includes' ]);
-    add_settings_field('slg_field_custom_disallow', esc_html__( 'Custom Disallow Rules', 'simple-llms-txt-generator' ), 'llms_txt_generator_field_custom_disallow_callback', 'llms_txt_page', 'slg_section_disallow_rules');
+    add_settings_field('slg_field_disallow_wp_admin', esc_html__( 'Disallow /wp-admin/', 'kandeshop-llms-txt-generator' ), 'llms_txt_generator_field_checkbox_callback', 'llms_txt_page', 'slg_section_disallow_rules', [ 'label_for' => 'slg_field_disallow_wp_admin', 'option_name' => 'disallow_wp_admin' ]);
+    add_settings_field('slg_field_disallow_wp_includes', esc_html__( 'Disallow /wp-includes/', 'kandeshop-llms-txt-generator' ), 'llms_txt_generator_field_checkbox_callback', 'llms_txt_page', 'slg_section_disallow_rules', [ 'label_for' => 'slg_field_disallow_wp_includes', 'option_name' => 'disallow_wp_includes' ]);
+    add_settings_field('slg_field_custom_disallow', esc_html__( 'Custom Disallow Rules', 'kandeshop-llms-txt-generator' ), 'llms_txt_generator_field_custom_disallow_callback', 'llms_txt_page', 'slg_section_disallow_rules');
 }
 add_action( 'admin_init', 'llms_txt_generator_settings_init' );
 
@@ -114,13 +114,13 @@ function llms_txt_generator_options_sanitize( $input ) {
  * Section callbacks.
  */
 function llms_txt_generator_section_user_agents_callback() {
-    echo '<p>' . esc_html__( 'Select the AI crawlers you wish to add rules for. The policies and rules below will apply to all selected agents.', 'simple-llms-txt-generator' ) . '</p>';
+    echo '<p>' . esc_html__( 'Select the AI crawlers you wish to add rules for. The policies and rules below will apply to all selected agents.', 'kandeshop-llms-txt-generator' ) . '</p>';
 }
 function llms_txt_generator_section_usage_policies_callback() {
-    echo '<p>' . esc_html__( 'Specify how the selected AI agents are permitted to use your site content.', 'simple-llms-txt-generator' ) . '</p>';
+    echo '<p>' . esc_html__( 'Specify how the selected AI agents are permitted to use your site content.', 'kandeshop-llms-txt-generator' ) . '</p>';
 }
 function llms_txt_generator_section_disallow_rules_callback() {
-    echo '<p>' . esc_html__( 'Select standard paths to block, and add any other custom paths you want to disallow.', 'simple-llms-txt-generator' ) . '</p>';
+    echo '<p>' . esc_html__( 'Select standard paths to block, and add any other custom paths you want to disallow.', 'kandeshop-llms-txt-generator' ) . '</p>';
 }
 
 /**
@@ -146,20 +146,20 @@ function llms_txt_generator_field_policy_select_callback( $args ) {
         esc_attr( $args['label_for'] ),
         esc_attr( $option_name )
     );
-    echo '<option value="allow"' . selected($current_value, 'allow', false) . '>' . esc_html__('Allow', 'simple-llms-txt-generator') . '</option>';
-    echo '<option value="disallow"' . selected($current_value, 'disallow', false) . '>' . esc_html__('Disallow', 'simple-llms-txt-generator') . '</option>';
+    echo '<option value="allow"' . selected($current_value, 'allow', false) . '>' . esc_html__('Allow', 'kandeshop-llms-txt-generator') . '</option>';
+    echo '<option value="disallow"' . selected($current_value, 'disallow', false) . '>' . esc_html__('Disallow', 'kandeshop-llms-txt-generator') . '</option>';
     // translators: %s: The policy name (Training, Summarization, etc.).
-    echo '<p class="description">' . sprintf( esc_html__( 'Controls if AI can use content for %s.', 'simple-llms-txt-generator' ), '<strong>' . esc_html( ucfirst($option_name) ) . '</strong>' ) . '</p>';
+    echo '<p class="description">' . sprintf( esc_html__( 'Controls if AI can use content for %s.', 'kandeshop-llms-txt-generator' ), '<strong>' . esc_html( ucfirst($option_name) ) . '</strong>' ) . '</p>';
 }
 function llms_txt_generator_field_custom_disallow_callback() {
     $options = get_option( 'slg_options', [] );
-    $custom_rules = isset( $options['custom_disallow'] ) ? $options['custom_disallow'] : '';
+    $custom_rules = isset( $options['custom_disallow'] ) ? esc_textarea( $options['custom_disallow'] ) : '';
     printf(
         '<textarea name="slg_options[custom_disallow]" rows="5" cols="50" class="large-text" placeholder="%s">%s</textarea>',
         esc_attr( '/private-directory/' . "\n" . '/some-specific-page.html' ),
-        esc_textarea( $custom_rules )
+        $custom_rules
     );
-    echo '<p class="description">' . esc_html__( 'Enter one path per line, starting with a slash. e.g., /wp-content/plugins/', 'simple-llms-txt-generator' ) . '</p>';
+    echo '<p class="description">' . esc_html__( 'Enter one path per line, starting with a slash. e.g., /wp-content/plugins/', 'kandeshop-llms-txt-generator' ) . '</p>';
 }
 
 /**
@@ -273,17 +273,17 @@ function llms_txt_generator_display_admin_notices() {
         }
 
         echo '<div class="notice notice-success is-dismissible"><p>';
-        echo esc_html__( 'Success! The llms.txt file has been generated and uploaded to your site root.', 'simple-llms-txt-generator' ) . esc_html( $size_text ) . ' ';
+        echo esc_html__( 'Success! The llms.txt file has been generated and uploaded to your site root.', 'kandeshop-llms-txt-generator' ) . esc_html( $size_text ) . ' ';
         // translators: %s: a link to the llms.txt file.
         printf(
-            esc_html__( 'You can %s.', 'simple-llms-txt-generator' ),
-            sprintf( '<a href="%s" target="_blank">%s</a>', esc_url( $file_url ), esc_html__( 'view it here', 'simple-llms-txt-generator' ) )
+            esc_html__( 'You can %s.', 'kandeshop-llms-txt-generator' ),
+            sprintf( '<a href="%s" target="_blank">%s</a>', esc_url( $file_url ), esc_html__( 'view it here', 'kandeshop-llms-txt-generator' ) )
         );
         echo '</p></div>';
     } elseif ( 'download_ready' === $notice ) {
-        echo '<div class="notice notice-info is-dismissible"><p>' . esc_html__( 'A fresh copy of llms.txt has been prepared for download.', 'simple-llms-txt-generator' ) . '</p></div>';
+        echo '<div class="notice notice-info is-dismissible"><p>' . esc_html__( 'A fresh copy of llms.txt has been prepared for download.', 'kandeshop-llms-txt-generator' ) . '</p></div>';
     } else {
-        echo '<div class="notice notice-error is-dismissible"><p>' . esc_html__( 'Error: The llms.txt file could not be created. Please check write permissions to the WordPress root directory.', 'simple-llms-txt-generator' ) . '</p></div>';
+        echo '<div class="notice notice-error is-dismissible"><p>' . esc_html__( 'Error: The llms.txt file could not be created. Please check write permissions to the WordPress root directory.', 'kandeshop-llms-txt-generator' ) . '</p></div>';
     }
 
     delete_transient( 'slg_admin_notice' );
@@ -304,31 +304,31 @@ function llms_txt_generator_options_page_html() {
     ?>
     <div class="wrap">
         <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-        <p><?php echo esc_html__( 'This page lets you create an', 'simple-llms-txt-generator' ); ?> <code>llms.txt</code> <?php echo esc_html__( 'file (like robots.txt) to guide LLM/AI crawlers.', 'simple-llms-txt-generator' ); ?></p>
+        <p><?php echo esc_html__( 'This page lets you create an', 'kandeshop-llms-txt-generator' ); ?> <code>llms.txt</code> <?php echo esc_html__( 'file (like robots.txt) to guide LLM/AI crawlers.', 'kandeshop-llms-txt-generator' ); ?></p>
 
         <form action="options.php" method="post" style="margin-top:1em;">
             <?php
             settings_fields( 'llms_txt_page' );
             do_settings_sections( 'llms_txt_page' );
-            submit_button( esc_html__( 'Save Settings & Generate File', 'simple-llms-txt-generator' ) );
+            submit_button( esc_html__( 'Save Settings & Generate File', 'kandeshop-llms-txt-generator' ) );
             ?>
         </form>
 
         <hr style="margin: 24px 0;">
 
-        <h2><?php echo esc_html__( 'Actions', 'simple-llms-txt-generator' ); ?></h2>
-        <p><?php echo esc_html__( 'Use these tools to generate or download the current llms.txt anytime:', 'simple-llms-txt-generator' ); ?></p>
+        <h2><?php echo esc_html__( 'Actions', 'kandeshop-llms-txt-generator' ); ?></h2>
+        <p><?php echo esc_html__( 'Use these tools to generate or download the current llms.txt anytime:', 'kandeshop-llms-txt-generator' ); ?></p>
 
         <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block; margin-right:10px;">
             <?php wp_nonce_field( $generate_action . '_nonce', '_slg_nonce' ); ?>
             <input type="hidden" name="action" value="<?php echo esc_attr( $generate_action ); ?>">
-            <?php submit_button( esc_html__( 'Generate Now', 'simple-llms-txt-generator' ), 'primary', 'submit', false ); ?>
+            <?php submit_button( esc_html__( 'Generate Now', 'kandeshop-llms-txt-generator' ), 'primary', 'submit', false ); ?>
         </form>
 
         <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline-block;">
             <?php wp_nonce_field( $download_action . '_nonce', '_slg_nonce' ); ?>
             <input type="hidden" name="action" value="<?php echo esc_attr( $download_action ); ?>">
-            <?php submit_button( $file_exists ? esc_html__( 'Download Current llms.txt', 'simple-llms-txt-generator' ) : esc_html__( 'Download Preview llms.txt', 'simple-llms-txt-generator' ), 'secondary', 'submit', false ); ?>
+            <?php submit_button( $file_exists ? esc_html__( 'Download Current llms.txt', 'kandeshop-llms-txt-generator' ) : esc_html__( 'Download Preview llms.txt', 'kandeshop-llms-txt-generator' ), 'secondary', 'submit', false ); ?>
         </form>
 
         <?php if ( $file_exists ) : ?>
@@ -336,8 +336,8 @@ function llms_txt_generator_options_page_html() {
                 <?php
                 // translators: %s: a link to the llms.txt file.
                 printf(
-                    esc_html__( 'Current file: %s', 'simple-llms-txt-generator' ),
-                    sprintf( '<a href="%s" target="_blank">%s</a>', esc_url( home_url( '/llms.txt' ) ), esc_html__( '/llms.txt', 'simple-llms-txt-generator' ) )
+                    esc_html__( 'Current file: %s', 'kandeshop-llms-txt-generator' ),
+                    sprintf( '<a href="%s" target="_blank">%s</a>', esc_url( home_url( '/llms.txt' ) ), esc_html__( '/llms.txt', 'kandeshop-llms-txt-generator' ) )
                 );
                 ?>
             </p>
@@ -351,7 +351,7 @@ function llms_txt_generator_options_page_html() {
  */
 function llms_txt_generator_handle_generate_now() {
     if ( ! current_user_can( 'manage_options' ) ) {
-        wp_die( esc_html__( 'Unauthorized.', 'simple-llms-txt-generator' ) );
+        wp_die( esc_html__( 'Unauthorized.', 'kandeshop-llms-txt-generator' ) );
     }
 
     $action = 'slg_generate_now';
@@ -376,7 +376,7 @@ add_action( 'admin_post_slg_generate_now', 'llms_txt_generator_handle_generate_n
  */
 function llms_txt_generator_handle_download_llms() {
     if ( ! current_user_can( 'manage_options' ) ) {
-        wp_die( esc_html__( 'Unauthorized.', 'simple-llms-txt-generator' ) );
+        wp_die( esc_html__( 'Unauthorized.', 'kandeshop-llms-txt-generator' ) );
     }
 
     $action = 'slg_download_llms';
