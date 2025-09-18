@@ -1,4 +1,4 @@
-=== Simple LLMS.txt Generator ===
+=== Kandeshop LLMS.txt Generator ===
 Contributors: Darren Kandekore
 Tags: llms.txt, llms, ai, SEO, robots.txt
 Requires at least: 6.0
@@ -34,7 +34,7 @@ This plugin lets you:
 ### Manual (FTP/SFTP)
 
 1.  Copy the plugin folder into `/wp-content/plugins/`.
-2.  In **Plugins**, activate **Simple LLMS.txt Generator**.
+2.  In **Plugins**, activate **Kandeshop LLMS.txt Generator**.
 
 == Frequently Asked Questions ==
 
